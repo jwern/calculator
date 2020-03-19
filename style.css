@@ -4,12 +4,13 @@ html, body, .outer-body {
 }
 
 .calculator-body {
-    width: 50%;
-    height: 80%;
-    min-width: 200px;
+    width: 50vmin;
+    height: 80vmin;
+    min-width: 300px;
     min-height: 400px;
     margin: auto;
-    background-color: gray;
+    background: rgb(188,189,188);
+    background: linear-gradient(180deg, rgba(188,189,188,1) 0%, rgba(99,99,99,1) 15%, rgba(51,51,51,1) 100%);
     display: grid;
     grid-template-columns: 3fr 1fr;
     grid-template-rows: 1fr 1fr 3fr;
@@ -20,6 +21,7 @@ html, body, .outer-body {
     grid-row: 1/2;
     background-color: white;
     margin: 20px;
+    min-height: 60px;
     display: flex;
     align-items: flex-end;
     flex-wrap: wrap;
@@ -30,6 +32,13 @@ html, body, .outer-body {
 .function-buttons {
     grid-column: 1/3;
     grid-row: 2/3;
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    margin: 10px;
+}
+
+#function-clear {
+    grid-column: 4/5;
 }
 
 .digit-buttons {
@@ -38,9 +47,63 @@ html, body, .outer-body {
     display: grid;
     grid-template-columns: repeat(3, 1fr);
     grid-template-rows: repeat(4, 1fr);
-    grid-gap: 5px;
+    grid-template-areas:
+        "seven eight nine"
+        "four five six"
+        "one two three"
+        "negative zero decimal";
+    grid-gap: 2%;
     margin: 10px;
 }
+
+#digit-1 {
+    grid-area: one;
+}
+
+#digit-2 {
+    grid-area: two;
+}
+
+#digit-3 {
+    grid-area: three;
+}
+
+#digit-4 {
+    grid-area: four;
+}
+
+#digit-5 {
+    grid-area: five;
+}
+
+#digit-6 {
+    grid-area: six;
+}
+
+#digit-7 {
+    grid-area: seven;
+}
+
+#digit-8 {
+    grid-area: eight;
+}
+
+#digit-9 {
+    grid-area: nine;
+}
+
+#digit-0 {
+    grid-area: zero;
+}
+
+#digit-decimal {
+    grid-area: decimal;
+}
+
+#digit-negative {
+    grid-area: negative;
+}
+
 
 .operator-buttons {
     grid-column: 2/3;
