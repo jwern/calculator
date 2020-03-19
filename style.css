@@ -1,0 +1,10 @@
+html, body, .outer-body {
+    height: 100%;
+}
+
+.calculator-body {
+    background-color: gray;
+    display: grid;
+    grid-template-columns: repeat(8, 1fr);
+    grid-template-rows: repeat(9, 1fr);
+}
