@@ -27,6 +27,7 @@ html, body, .outer-body {
     flex-wrap: wrap;
     word-break: break-word;
     justify-content: right;
+    overflow: auto;
 }
 
 .function-buttons {
