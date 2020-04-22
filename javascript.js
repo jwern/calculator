@@ -6,6 +6,7 @@ let numbersToCalculate = {
     secondNumber: "",
 };
 let lastButtonPressed = "";
+let numberToDisplay = "";
 
 buttons.forEach(button => button.addEventListener('click', displayButton));
 
@@ -34,23 +35,21 @@ function displayButton(button) {
 
     let buttonID = button.target.id;
 
-    console.log(buttonID);
+    /* if button pressed is Clear, delete all previous inputs */
     if (buttonID === "function-clear") {
         numbersToCalculate["firstNumber"] = "";
         numbersToCalculate["workingOperator"] = "";
         numbersToCalculate["secondNumber"] = "";
     }
 
-    console.log("Before anything is called:", numbersToCalculate["firstNumber"]);
-    console.log(numbersToCalculate["workingOperator"]);
-    console.log(numbersToCalculate["secondNumber"]);
-
+    /* if button pressed is equals sign (=), perform the operation and assign to firstNumber */
     if (buttonID === "operator-equals") {
         numbersToCalculate["firstNumber"] = `${operate(numbersToCalculate["workingOperator"], numbersToCalculate["firstNumber"], numbersToCalculate["secondNumber"])}`;
         numbersToCalculate["workingOperator"] = "";
         numbersToCalculate["secondNumber"] = "";
     }
 
+    /* if the button pressed is a digit, decimal, or the negative/positive */
     if (digitInput.hasOwnProperty(buttonID)) {
         if (buttonID === "digit-negative") {
             console.log("work in progress"); /* need to append negative to current number */
@@ -63,8 +62,8 @@ function displayButton(button) {
         };
     };
 
+    /* if the button pressed is an operator (+, -, *, /) */
     if (operatorInput.hasOwnProperty(buttonID)) {
-        console.log("Inside operatorInput function:", numbersToCalculate["workingOperator"]);
         if (numbersToCalculate["workingOperator"] === "") {
             numbersToCalculate["workingOperator"] = operatorInput[buttonID];
         } else if (numbersToCalculate["workingOperator"] !== "") {
@@ -73,36 +72,29 @@ function displayButton(button) {
             numbersToCalculate["secondNumber"] = "";
         };
     }
-    /* if we want to match the online-calculator example, we should only show the last number input before an operator (don't display the operator) */
-    resultsScreen.textContent = `${numbersToCalculate["firstNumber"]} ${numbersToCalculate["workingOperator"]} ${numbersToCalculate["secondNumber"]}`
 
-    console.log("At the end:", numbersToCalculate["firstNumber"]);
-    console.log(numbersToCalculate["workingOperator"]);
-    console.log(numbersToCalculate["secondNumber"]);
+    numberToDisplay = (numbersToCalculate["secondNumber"] || numbersToCalculate["firstNumber"]);
+
+    // resultsScreen.textContent = `${numbersToCalculate["firstNumber"]} ${numbersToCalculate["workingOperator"]} ${numbersToCalculate["secondNumber"]}`
+    resultsScreen.textContent = numberToDisplay;
 
     lastButtonPressed = buttonID;
-
-    // } else if (button.target.id === "operator-equals") {
-    //     resultsScreen.textContent = "" /* return result of operator */
-    // } else {
-    //     resultsScreen.textContent += (digitInput[button.target.id]);
-    // };
 }
 
-function add(num1, num2) {
-    return Number(num1) + Number(num2);
+function add(num1, num2) { 
+    return Number(num1) + Number(num2 || 0);
 }
 
 function subtract(num1, num2) {
-    return Number(num1) - Number(num2);
+    return Number(num1) - Number(num2 || 0);
 }
 
 function multiply(num1, num2) {
-    return Number(num1) * Number(num2);
+    return Number(num1) * Number(num2 || 1);
 }
 
 function divide(num1, num2) {
-    return Number(num1) / Number(num2);
+    return Number(num1) / Number(num2 || 1);
 }
 
 function operate(operator, num1, num2) {
@@ -112,8 +104,6 @@ function operate(operator, num1, num2) {
         "*": multiply,
         "/": divide,
     }
-    // need if statement to check for empty operator / num1 / num2
-    // num1 / num2 get turned into 0 on the Number() calls above
-    // cannot use default arguments on empty strings - only works on undefined or null
+
     return operators[operator](num1, num2);
 }
