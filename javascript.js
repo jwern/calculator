@@ -37,9 +37,7 @@ function displayButton(button) {
 
     /* if button pressed is Clear, delete all previous inputs */
     if (buttonID === "function-clear") {
-        numbersToCalculate["firstNumber"] = "";
-        numbersToCalculate["workingOperator"] = "";
-        numbersToCalculate["secondNumber"] = "";
+        clearNumbersToCalculate();
     }
 
     /* if button pressed is equals sign (=), perform the operation and assign to firstNumber */
@@ -81,6 +79,12 @@ function displayButton(button) {
     lastButtonPressed = buttonID;
 }
 
+function clearNumbersToCalculate() {
+    numbersToCalculate["firstNumber"] = "";
+    numbersToCalculate["workingOperator"] = "";
+    numbersToCalculate["secondNumber"] = "";
+}
+
 function add(num1, num2) { 
     return Number(num1) + Number(num2 || 0);
 }
@@ -94,7 +98,11 @@ function multiply(num1, num2) {
 }
 
 function divide(num1, num2) {
-    return Number(num1) / Number(num2 || 1);
+    if (num2 === "0") {
+        return "Can't divide by 0, duh";
+    } else {
+        return Number(num1) / Number(num2 || 1);
+    }
 }
 
 function operate(operator, num1, num2) {
