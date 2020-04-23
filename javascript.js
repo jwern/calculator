@@ -12,16 +12,16 @@ buttons.forEach(button => button.addEventListener('click', displayButton));
 
 function displayButton(button) {
     const digitInput = {
-        "digit-1": 1,
-        "digit-2": 2,
-        "digit-3": 3,
-        "digit-4": 4,
-        "digit-5": 5,
-        "digit-6": 6,
-        "digit-7": 7,
-        "digit-8": 8,
-        "digit-9": 9,
-        "digit-0": 0,
+        "digit-1": "1",
+        "digit-2": "2",
+        "digit-3": "3",
+        "digit-4": "4",
+        "digit-5": "5",
+        "digit-6": "6",
+        "digit-7": "7",
+        "digit-8": "8",
+        "digit-9": "9",
+        "digit-0": "0",
         "digit-decimal": ".",
         "digit-negative": "-",
     }
@@ -63,18 +63,30 @@ function displayButton(button) {
     /* if the button pressed is an operator (+, -, *, /) */
     if (operatorInput.hasOwnProperty(buttonID)) {
         if (numbersToCalculate["workingOperator"] === "") {
-            numbersToCalculate["workingOperator"] = operatorInput[buttonID];
-        } else if (numbersToCalculate["workingOperator"] !== "") {
+            numbersToCalculate["workingOperator"] = operatorInput[buttonID]; /* if there is no operator, assign as operator */
+        } else if (numbersToCalculate["workingOperator"] !== "" && operatorInput.hasOwnProperty(lastButtonPressed)) {
+            numbersToCalculate["workingOperator"] = operatorInput[buttonID]; /* if there is an operator that was just added, overwrite it.  Example: 2 + - 1 = 1, not 3 */
+        } else if (numbersToCalculate["workingOperator"] !== "") { /* if there is an operator, complete the calculation and assign result to firstNumber, then assign new operator */
             numbersToCalculate["firstNumber"] = `${operate(numbersToCalculate["workingOperator"], numbersToCalculate["firstNumber"], numbersToCalculate["secondNumber"])}`;
             numbersToCalculate["workingOperator"] = operatorInput[buttonID];
             numbersToCalculate["secondNumber"] = "";
         };
     }
 
-    numberToDisplay = (numbersToCalculate["secondNumber"] || numbersToCalculate["firstNumber"]);
+    numberToDisplay = (numbersToCalculate["secondNumber"] || numbersToCalculate["firstNumber"] || 0);
 
-    // resultsScreen.textContent = `${numbersToCalculate["firstNumber"]} ${numbersToCalculate["workingOperator"]} ${numbersToCalculate["secondNumber"]}`
+    /* remove leading zeroes; keep zero if number is single-digit */
+    if (numberToDisplay[0] === "0" && numberToDisplay.length > 1) {
+        numberToDisplay = numberToDisplay.slice(1);
+    }
+
     resultsScreen.textContent = numberToDisplay;
+
+    /* remove error or NaN values before the next calculation */
+    /* this "works" but may be preferred to try to keep the number from before the error */
+    if (isNaN(numbersToCalculate["firstNumber"]) || isNaN(numbersToCalculate["secondNumber"])) {
+        clearNumbersToCalculate();
+    }
 
     lastButtonPressed = buttonID;
 }
@@ -86,22 +98,22 @@ function clearNumbersToCalculate() {
 }
 
 function add(num1, num2) { 
-    return Number(num1) + Number(num2 || 0);
+    return Number(num1) + Number(num2 || num1);
 }
 
 function subtract(num1, num2) {
-    return Number(num1) - Number(num2 || 0);
+    return Number(num1) - Number(num2 || num1);
 }
 
 function multiply(num1, num2) {
-    return Number(num1) * Number(num2 || 1);
+    return Number(num1) * Number(num2 || num1);
 }
 
 function divide(num1, num2) {
     if (num2 === "0") {
-        return "Can't divide by 0, duh";
+        return "Can't divide by 0";
     } else {
-        return Number(num1) / Number(num2 || 1);
+        return Number(num1) / Number(num2 || num1);
     }
 }
 
