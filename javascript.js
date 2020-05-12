@@ -58,17 +58,9 @@ function displayButton(button) {
     /* if the button pressed is a digit, decimal, or the negative/positive */
     if (digitInput.hasOwnProperty(buttonID)) {
         if (buttonID === "digit-negative" && numbersToCalculate["workingOperator"] === "") {
-            if (numbersToCalculate["firstNumber"][0] === "-") {
-                numbersToCalculate["firstNumber"] = numbersToCalculate["firstNumber"].slice(1);
-            } else {
-                numbersToCalculate["firstNumber"] = `-${numbersToCalculate["firstNumber"]}`;
-            };
+            numbersToCalculate["firstNumber"] = addOrRemoveNegative(numbersToCalculate["firstNumber"]);
         } else if (buttonID === "digit-negative" && numbersToCalculate["workingOperator"] !== "") {
-            if (numbersToCalculate["secondNumber"][0] === "-") {
-                numbersToCalculate["secondNumber"] = numbersToCalculate["secondNumber"].slice(1);
-            } else {
-                numbersToCalculate["secondNumber"] = `-${numbersToCalculate["secondNumber"]}`;
-            };
+            numbersToCalculate["secondNumber"] = addOrRemoveNegative(numbersToCalculate["secondNumber"]);
         } else if (numbersToCalculate["workingOperator"] === "" && lastButtonPressed !== "operator-equals") {
             numbersToCalculate["firstNumber"] += digitInput[buttonID]; /* if there is no operator, we're still adding digits to the first number */
         } else if (numbersToCalculate["workingOperator"] === "" && lastButtonPressed === "operator-equals") {
@@ -91,13 +83,8 @@ function displayButton(button) {
         };
     }
 
-    numberToDisplay = (numbersToCalculate["secondNumber"] || numbersToCalculate["firstNumber"] || 0);
-
-    /* remove leading zeroes; keep zero if number is single-digit */
-    if (numberToDisplay[0] === "0" && numberToDisplay.length > 1) {
-        numberToDisplay = numberToDisplay.slice(1);
-    }
-
+    numberToDisplay = removeLeadingZeroes(numbersToCalculate["secondNumber"] || numbersToCalculate["firstNumber"] || 0);
+    
     resultsScreen.textContent = numberToDisplay;
 
     /* remove error or NaN values before the next calculation */
@@ -110,6 +97,22 @@ function displayButton(button) {
     }
 
     lastButtonPressed = buttonID;
+}
+
+function addOrRemoveNegative(string) {
+    if (string[0] === "-") {
+        return string.slice(1);
+    } else {
+        return `-${string}`;
+    };
+}
+
+function removeLeadingZeroes(number) {
+    while (number[0] === "0" && number.length > 1) {
+        number = number.slice(1);
+    }
+
+    return number;
 }
 
 function clearNumbersToCalculate() {
