@@ -6,6 +6,10 @@ let numbersToCalculate = {
     secondNumber: "",
 };
 let lastButtonPressed = "";
+let lastOperation = {
+    lastNumber: "",
+    lastOperator: "",
+}
 let numberToDisplay = "";
 
 buttons.forEach(button => button.addEventListener('click', displayButton));
@@ -41,16 +45,30 @@ function displayButton(button) {
     }
 
     /* if button pressed is equals sign (=), perform the operation and assign to firstNumber */
-    if (buttonID === "operator-equals") {
+    if (buttonID === "operator-equals" && lastButtonPressed === "operator-equals") {
+        numbersToCalculate["firstNumber"] = `${operate(lastOperation["lastOperator"], numbersToCalculate["firstNumber"], lastOperation["lastNumber"])}`;
+    } else if (buttonID === "operator-equals") {
         numbersToCalculate["firstNumber"] = `${operate(numbersToCalculate["workingOperator"], numbersToCalculate["firstNumber"], numbersToCalculate["secondNumber"])}`;
+        lastOperation["lastNumber"] = numbersToCalculate["secondNumber"];
+        lastOperation["lastOperator"] = numbersToCalculate["workingOperator"];
         numbersToCalculate["workingOperator"] = "";
         numbersToCalculate["secondNumber"] = "";
     }
 
     /* if the button pressed is a digit, decimal, or the negative/positive */
     if (digitInput.hasOwnProperty(buttonID)) {
-        if (buttonID === "digit-negative") {
-            console.log("work in progress"); /* need to append negative to current number */
+        if (buttonID === "digit-negative" && numbersToCalculate["workingOperator"] === "") {
+            if (numbersToCalculate["firstNumber"][0] === "-") {
+                numbersToCalculate["firstNumber"] = numbersToCalculate["firstNumber"].slice(1);
+            } else {
+                numbersToCalculate["firstNumber"] = `-${numbersToCalculate["firstNumber"]}`;
+            };
+        } else if (buttonID === "digit-negative" && numbersToCalculate["workingOperator"] !== "") {
+            if (numbersToCalculate["secondNumber"][0] === "-") {
+                numbersToCalculate["secondNumber"] = numbersToCalculate["secondNumber"].slice(1);
+            } else {
+                numbersToCalculate["secondNumber"] = `-${numbersToCalculate["secondNumber"]}`;
+            };
         } else if (numbersToCalculate["workingOperator"] === "" && lastButtonPressed !== "operator-equals") {
             numbersToCalculate["firstNumber"] += digitInput[buttonID]; /* if there is no operator, we're still adding digits to the first number */
         } else if (numbersToCalculate["workingOperator"] === "" && lastButtonPressed === "operator-equals") {
@@ -83,9 +101,12 @@ function displayButton(button) {
     resultsScreen.textContent = numberToDisplay;
 
     /* remove error or NaN values before the next calculation */
+    /* do not remove singular negative sign */
     /* this "works" but may be preferred to try to keep the number from before the error */
     if (isNaN(numbersToCalculate["firstNumber"]) || isNaN(numbersToCalculate["secondNumber"])) {
-        clearNumbersToCalculate();
+        if (numbersToCalculate["firstNumber"] !== "-" && numbersToCalculate["secondNumber"] !== "-") {
+            clearNumbersToCalculate();
+        }
     }
 
     lastButtonPressed = buttonID;
