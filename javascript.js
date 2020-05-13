@@ -1,11 +1,12 @@
 let buttons = document.querySelectorAll('button');
 let resultsScreen = document.querySelector('.results');
+resultsScreen.textContent = "0";
 let numbersToCalculate = {
     firstNumber: "",
     workingOperator: "",
     secondNumber: "",
 };
-let lastButtonPressed = "";
+let lastButtonPressed = ""; // Updated at the very end of displayButton function so you can refer to it anytime before then
 let lastOperation = {
     lastNumber: "",
     lastOperator: "",
@@ -57,26 +58,26 @@ function displayButton(button) {
 
     /* if the button pressed is a digit, decimal, or the negative/positive */
     if (digitInput.hasOwnProperty(buttonID)) {
-        if (buttonID === "digit-negative" && numbersToCalculate["workingOperator"] === "") {
+        if (buttonID === "digit-negative" && firstNumberEditable()) {
             numbersToCalculate["firstNumber"] = addOrRemoveNegative(numbersToCalculate["firstNumber"]);
-        } else if (buttonID === "digit-negative" && numbersToCalculate["workingOperator"] !== "") {
+        } else if (buttonID === "digit-negative" && !firstNumberEditable()) {
             numbersToCalculate["secondNumber"] = addOrRemoveNegative(numbersToCalculate["secondNumber"]);
-        } else if (numbersToCalculate["workingOperator"] === "" && lastButtonPressed !== "operator-equals") {
+        } else if (firstNumberEditable() && lastButtonPressed !== "operator-equals") {
             numbersToCalculate["firstNumber"] += digitInput[buttonID]; /* if there is no operator, we're still adding digits to the first number */
-        } else if (numbersToCalculate["workingOperator"] === "" && lastButtonPressed === "operator-equals") {
+        } else if (firstNumberEditable() && lastButtonPressed === "operator-equals") {
             numbersToCalculate["firstNumber"] = digitInput[buttonID];
-        } else if (numbersToCalculate["workingOperator"] !== "") {
+        } else if (!firstNumberEditable()) {
             numbersToCalculate["secondNumber"] += digitInput[buttonID]; /* if there IS an operator, add digits to the second number */
         };
     };
 
     /* if the button pressed is an operator (+, -, *, /) */
     if (operatorInput.hasOwnProperty(buttonID)) {
-        if (numbersToCalculate["workingOperator"] === "") {
+        if (firstNumberEditable()) {
             numbersToCalculate["workingOperator"] = operatorInput[buttonID]; /* if there is no operator, assign as operator */
-        } else if (numbersToCalculate["workingOperator"] !== "" && operatorInput.hasOwnProperty(lastButtonPressed)) {
+        } else if (!firstNumberEditable() && operatorInput.hasOwnProperty(lastButtonPressed)) {
             numbersToCalculate["workingOperator"] = operatorInput[buttonID]; /* if there is an operator that was just added, overwrite it.  Example: 2 + - 1 = 1, not 3 */
-        } else if (numbersToCalculate["workingOperator"] !== "") { /* if there is an operator, complete the calculation and assign result to firstNumber, then assign new operator */
+        } else if (!firstNumberEditable()) { /* if there is an operator, complete the calculation and assign result to firstNumber, then assign new operator */
             numbersToCalculate["firstNumber"] = `${operate(numbersToCalculate["workingOperator"], numbersToCalculate["firstNumber"], numbersToCalculate["secondNumber"])}`;
             numbersToCalculate["workingOperator"] = operatorInput[buttonID];
             numbersToCalculate["secondNumber"] = "";
@@ -97,6 +98,10 @@ function displayButton(button) {
     }
 
     lastButtonPressed = buttonID;
+}
+
+function firstNumberEditable() { // Checks if operator is empty, which tells us if we're editing the firstNumber (true) or secondNumber (false)
+    return numbersToCalculate["workingOperator"] === "";
 }
 
 function addOrRemoveNegative(string) {
