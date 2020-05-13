@@ -44,30 +44,39 @@ function displayButton(button) {
     if (buttonID === "function-clear") {
         clearNumbersToCalculate();
     }
-
+    
     /* if button pressed is equals sign (=), perform the operation and assign to firstNumber */
-    if (buttonID === "operator-equals" && lastButtonPressed === "operator-equals") {
-        numbersToCalculate["firstNumber"] = `${operate(lastOperation["lastOperator"], numbersToCalculate["firstNumber"], lastOperation["lastNumber"])}`;
-    } else if (buttonID === "operator-equals") {
-        numbersToCalculate["firstNumber"] = `${operate(numbersToCalculate["workingOperator"], numbersToCalculate["firstNumber"], numbersToCalculate["secondNumber"])}`;
-        lastOperation["lastNumber"] = numbersToCalculate["secondNumber"];
-        lastOperation["lastOperator"] = numbersToCalculate["workingOperator"];
-        numbersToCalculate["workingOperator"] = "";
-        numbersToCalculate["secondNumber"] = "";
-    }
-
+    if (buttonID === "operator-equals") {
+        if (lastButtonPressed === "operator-equals") {
+            numbersToCalculate["firstNumber"] = `${operate(lastOperation["lastOperator"], numbersToCalculate["firstNumber"], lastOperation["lastNumber"])}`;
+        } else {
+            if (numbersToCalculate["secondNumber"] === "") {
+                lastOperation["lastNumber"] = numbersToCalculate["firstNumber"];
+            } else {
+                lastOperation["lastNumber"] = numbersToCalculate["secondNumber"];
+            };
+            numbersToCalculate["firstNumber"] = `${operate(numbersToCalculate["workingOperator"], numbersToCalculate["firstNumber"], numbersToCalculate["secondNumber"])}`;
+            lastOperation["lastOperator"] = numbersToCalculate["workingOperator"];
+            numbersToCalculate["workingOperator"] = "";
+            numbersToCalculate["secondNumber"] = "";
+        };
+    };
     /* if the button pressed is a digit, decimal, or the negative/positive */
     if (digitInput.hasOwnProperty(buttonID)) {
-        if (buttonID === "digit-negative" && firstNumberEditable()) {
-            numbersToCalculate["firstNumber"] = addOrRemoveNegative(numbersToCalculate["firstNumber"]);
-        } else if (buttonID === "digit-negative" && !firstNumberEditable()) {
-            numbersToCalculate["secondNumber"] = addOrRemoveNegative(numbersToCalculate["secondNumber"]);
-        } else if (firstNumberEditable() && lastButtonPressed !== "operator-equals") {
-            numbersToCalculate["firstNumber"] += digitInput[buttonID]; /* if there is no operator, we're still adding digits to the first number */
-        } else if (firstNumberEditable() && lastButtonPressed === "operator-equals") {
-            numbersToCalculate["firstNumber"] = digitInput[buttonID];
-        } else if (!firstNumberEditable()) {
-            numbersToCalculate["secondNumber"] += digitInput[buttonID]; /* if there IS an operator, add digits to the second number */
+        if (buttonID === "digit-negative") {
+            if (firstNumberEditable()) {
+                numbersToCalculate["firstNumber"] = addOrRemoveNegative(numbersToCalculate["firstNumber"]);
+            } else {
+                numbersToCalculate["secondNumber"] = addOrRemoveNegative(numbersToCalculate["secondNumber"]);
+            };
+        } else if (firstNumberEditable()) {
+            if (lastButtonPressed === "operator-equals") { /* if the last button pressed was "=", we're editing firstNumber from scratch again, not appending digits */
+                numbersToCalculate["firstNumber"] = digitInput[buttonID];
+            } else {
+                numbersToCalculate["firstNumber"] += digitInput[buttonID]; /* if last button was not "=", append digits to firstNumber */
+            };
+        } else {
+            numbersToCalculate["secondNumber"] += digitInput[buttonID];
         };
     };
 
@@ -75,12 +84,14 @@ function displayButton(button) {
     if (operatorInput.hasOwnProperty(buttonID)) {
         if (firstNumberEditable()) {
             numbersToCalculate["workingOperator"] = operatorInput[buttonID]; /* if there is no operator, assign as operator */
-        } else if (!firstNumberEditable() && operatorInput.hasOwnProperty(lastButtonPressed)) {
-            numbersToCalculate["workingOperator"] = operatorInput[buttonID]; /* if there is an operator that was just added, overwrite it.  Example: 2 + - 1 = 1, not 3 */
-        } else if (!firstNumberEditable()) { /* if there is an operator, complete the calculation and assign result to firstNumber, then assign new operator */
-            numbersToCalculate["firstNumber"] = `${operate(numbersToCalculate["workingOperator"], numbersToCalculate["firstNumber"], numbersToCalculate["secondNumber"])}`;
-            numbersToCalculate["workingOperator"] = operatorInput[buttonID];
-            numbersToCalculate["secondNumber"] = "";
+        } else if (!firstNumberEditable()) {
+            if (operatorInput.hasOwnProperty(lastButtonPressed)) {
+                numbersToCalculate["workingOperator"] = operatorInput[buttonID]; /* if there is an operator that was just added, overwrite it.  Example: 2 + - 1 = 1, not 3 */
+            } else { /* if there is an operator, complete the calculation and assign result to firstNumber, then assign new operator */
+                numbersToCalculate["firstNumber"] = `${operate(numbersToCalculate["workingOperator"], numbersToCalculate["firstNumber"], numbersToCalculate["secondNumber"])}`;
+                numbersToCalculate["workingOperator"] = operatorInput[buttonID];
+                numbersToCalculate["secondNumber"] = "";
+            };
         };
     }
 
@@ -106,24 +117,24 @@ function firstNumberEditable() { // Checks if operator is empty, which tells us 
 
 function addOrRemoveNegative(string) {
     if (string[0] === "-") {
-        return string.slice(1);
+        return string.slice(1); // if first letter is negative, remove the negative
     } else {
-        return `-${string}`;
+        return `-${string}`; // otherwise add the negative
     };
 }
 
 function removeLeadingZeroes(number) {
-    while (number[0] === "0" && number.length > 1) {
-        number = number.slice(1);
+    while (number[0] === "0" && number.length > 1) { // as long as the first digit is zero and the number is longer than 1 digit:
+        number = number.slice(1); // remove the first 0
     }
 
     return number;
 }
 
 function clearNumbersToCalculate() {
-    numbersToCalculate["firstNumber"] = "";
-    numbersToCalculate["workingOperator"] = "";
-    numbersToCalculate["secondNumber"] = "";
+    for (key in numbersToCalculate) {
+        numbersToCalculate[key] = "";
+    };
 }
 
 function add(num1, num2) { 
