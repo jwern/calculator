@@ -105,15 +105,13 @@ function displayButton(button) {
         };
     }
 
-    numberToDisplay = removeLeadingZeroes(numbersToCalculate["secondNumber"] || numbersToCalculate["firstNumber"] || 0);
+    numberToDisplay = removeLeadingZeroes(numbersToCalculate["secondNumber"] || numbersToCalculate["firstNumber"] || "0");
     
     resultsScreen.textContent = numberToDisplay;
 
-    /* remove error or NaN values before the next calculation */
-    /* do not remove singular negative sign */
-    /* this "works" but may be preferred to try to keep the number from before the error */
+    /* remove NaN values before the next calculation */
     checkForErrors;
-
+    
     lastButtonPressed = buttonID;
 }
 
@@ -144,6 +142,7 @@ function addOrRemoveNegative(string) {
 }
 
 function removeLeadingZeroes(number) {
+    // TO-DO: Need to address zeroes earlier in the process and within the actual numbersToCalculate instead of just the display value
     while (number[0] === "0" && number.length > 1) { // as long as the first digit is zero and the number is longer than 1 digit:
         number = number.slice(1); // remove the first 0
     }
@@ -157,7 +156,7 @@ function clearNumbersToCalculate() {
     };
 }
 
-function addZeroes(num) { // Prevent NaN errors if input is only a negative sign or decimal
+function addZeroes(num) { // Prevent NaN errors if input is only a negative sign or decimal (TEMP fix)
     let acceptedDigits = {
         "-": "-0",
         ".": "0.",
@@ -195,4 +194,8 @@ function operate(operator, num1, num2) {
     }
 
     return operators[operator](addZeroes(num1), addZeroes(num2));
+    // TO-DO: Ideally we'll deal with zeroes before they get to the operate function
+    // and will be able to switch back to just (num1, num2) here
+    // addZeroes function is a temporary fix for solitary decimals or negatives
+    // so they don't cause NaN errors
 }
