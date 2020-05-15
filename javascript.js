@@ -1,17 +1,21 @@
 let buttons = document.querySelectorAll('button');
 let resultsScreen = document.querySelector('.results');
-resultsScreen.textContent = "0";
+
+let numberToDisplay = "0";
+resultsScreen.textContent = numberToDisplay;
+
 let numbersToCalculate = {
     firstNumber: "",
     workingOperator: "",
     secondNumber: "",
 };
+
 let lastButtonPressed = ""; // Updated at the very end of displayButton function so you can refer to it anytime before then
+
 let lastOperation = {
     lastNumber: "",
     lastOperator: "",
 }
-let numberToDisplay = "";
 
 buttons.forEach(button => button.addEventListener('click', displayButton));
 
@@ -48,14 +52,12 @@ function displayButton(button) {
     if (buttonID === "function-backspace") {
         if (lastButtonPressed === "operator-equals") {
             return;
-        } else if (firstNumberEditable()) {
-            numbersToCalculate["firstNumber"] = numbersToCalculate["firstNumber"].slice(0, -1);
         } else {
-            numbersToCalculate["secondNumber"] = numbersToCalculate["secondNumber"].slice(0, -1);
+            numbersToCalculate[activeNumber()] = numbersToCalculate[activeNumber()].slice(0, -1);
         };
     }
     
-    /* if button pressed is equals sign (=), perform the operation and assign to firstNumber */
+    /* if button pressed is equals sign (=) */
     if (buttonID === "operator-equals") {
         if (lastButtonPressed === "operator-equals") {
             numbersToCalculate["firstNumber"] = `${operate(lastOperation["lastOperator"], numbersToCalculate["firstNumber"], lastOperation["lastNumber"])}`;
@@ -71,28 +73,20 @@ function displayButton(button) {
             numbersToCalculate["secondNumber"] = "";
         };
     };
+
     /* if the button pressed is a digit, decimal, or the negative/positive */
     if (digitInput.hasOwnProperty(buttonID)) {
         if (buttonID === "digit-negative") {
-            if (firstNumberEditable()) {
-                numbersToCalculate["firstNumber"] = addOrRemoveNegative(numbersToCalculate["firstNumber"]);
-            } else {
-                numbersToCalculate["secondNumber"] = addOrRemoveNegative(numbersToCalculate["secondNumber"]);
-            };
-        } else if (firstNumberEditable()) {
-            if (lastButtonPressed === "operator-equals") { /* if the last button pressed was "=", we're editing firstNumber from scratch again, not appending digits */
-                numbersToCalculate["firstNumber"] = digitInput[buttonID];
-            } else if (buttonID === "digit-decimal" && numbersToCalculate["firstNumber"].includes(".")) {
-                return;
-            } else {
-                numbersToCalculate["firstNumber"] += digitInput[buttonID]; /* if last button was not "=", append digits to firstNumber */
-            };
+            numbersToCalculate[activeNumber()] = addOrRemoveNegative(numbersToCalculate[activeNumber()]);
         } else {
-            if (buttonID === "digit-decimal" && numbersToCalculate["secondNumber"].includes(".")) {
-                return;
+            if (lastButtonPressed === "operator-equals") { /* if the last button pressed was "=", we're editing from scratch again, not appending digits */
+                numbersToCalculate[activeNumber()] = digitInput[buttonID];
+            } else if (buttonID === "digit-decimal" && numbersToCalculate[activeNumber()].includes(".")) {
+                return; // if the activeNumber already has a decimal in it and decimal is hit again, don't add another decimal - exit function
             } else {
-                numbersToCalculate["secondNumber"] += digitInput[buttonID];
+                numbersToCalculate[activeNumber()] += digitInput[buttonID];
             };
+            
         };
     };
 
@@ -100,7 +94,7 @@ function displayButton(button) {
     if (operatorInput.hasOwnProperty(buttonID)) {
         if (firstNumberEditable()) {
             numbersToCalculate["workingOperator"] = operatorInput[buttonID]; /* if there is no operator, assign as operator */
-        } else if (!firstNumberEditable()) {
+        } else {
             if (operatorInput.hasOwnProperty(lastButtonPressed)) {
                 numbersToCalculate["workingOperator"] = operatorInput[buttonID]; /* if there is an operator that was just added, overwrite it.  Example: 2 + - 1 = 1, not 3 */
             } else { /* if there is an operator, complete the calculation and assign result to firstNumber, then assign new operator */
@@ -118,17 +112,27 @@ function displayButton(button) {
     /* remove error or NaN values before the next calculation */
     /* do not remove singular negative sign */
     /* this "works" but may be preferred to try to keep the number from before the error */
-    if (isNaN(numbersToCalculate["firstNumber"]) || isNaN(numbersToCalculate["secondNumber"])) {
-        if (numbersToCalculate["firstNumber"] !== "-" && numbersToCalculate["firstNumber"] !== "." && numbersToCalculate["secondNumber"] !== "-" && numbersToCalculate["secondNumber"] !== ".") {
-            clearNumbersToCalculate();
-        }
-    }
+    checkForErrors;
 
     lastButtonPressed = buttonID;
 }
 
+function checkForErrors() {
+    if (isNaN(numbersToCalculate["firstNumber"]) || isNaN(numbersToCalculate["secondNumber"])) {
+        clearNumbersToCalculate();
+    }
+}
+
 function firstNumberEditable() { // Checks if operator is empty, which tells us if we're editing the firstNumber (true) or secondNumber (false)
     return numbersToCalculate["workingOperator"] === "";
+}
+
+function activeNumber() { // Determines which number in numbersToCalculate we're currently editing
+    if (firstNumberEditable()) {
+        return "firstNumber";
+    } else {
+        return "secondNumber";
+    };
 }
 
 function addOrRemoveNegative(string) {
@@ -151,6 +155,15 @@ function clearNumbersToCalculate() {
     for (key in numbersToCalculate) {
         numbersToCalculate[key] = "";
     };
+}
+
+function addZeroes(num) { // Prevent NaN errors if input is only a negative sign or decimal
+    let acceptedDigits = {
+        "-": "-0",
+        ".": "0.",
+    };
+
+    return acceptedDigits[num] || num;
 }
 
 function add(num1, num2) { 
@@ -181,5 +194,5 @@ function operate(operator, num1, num2) {
         "/": divide,
     }
 
-    return operators[operator](num1, num2);
+    return operators[operator](addZeroes(num1), addZeroes(num2));
 }
