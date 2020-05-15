@@ -35,10 +35,15 @@ html, body, .outer-body {
     grid-row: 2/3;
     display: grid;
     grid-template-columns: repeat(4, 1fr);
+    grid-gap: 10px;
     margin: 10px;
 }
 
 #function-clear {
+    grid-column: 3/4;
+}
+
+#function-backspace {
     grid-column: 4/5;
 }
 

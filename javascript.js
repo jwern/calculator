@@ -44,6 +44,16 @@ function displayButton(button) {
     if (buttonID === "function-clear") {
         clearNumbersToCalculate();
     }
+
+    if (buttonID === "function-backspace") {
+        if (lastButtonPressed === "operator-equals") {
+            return;
+        } else if (firstNumberEditable()) {
+            numbersToCalculate["firstNumber"] = numbersToCalculate["firstNumber"].slice(0, -1);
+        } else {
+            numbersToCalculate["secondNumber"] = numbersToCalculate["secondNumber"].slice(0, -1);
+        };
+    }
     
     /* if button pressed is equals sign (=), perform the operation and assign to firstNumber */
     if (buttonID === "operator-equals") {
@@ -72,11 +82,17 @@ function displayButton(button) {
         } else if (firstNumberEditable()) {
             if (lastButtonPressed === "operator-equals") { /* if the last button pressed was "=", we're editing firstNumber from scratch again, not appending digits */
                 numbersToCalculate["firstNumber"] = digitInput[buttonID];
+            } else if (buttonID === "digit-decimal" && numbersToCalculate["firstNumber"].includes(".")) {
+                return;
             } else {
                 numbersToCalculate["firstNumber"] += digitInput[buttonID]; /* if last button was not "=", append digits to firstNumber */
             };
         } else {
-            numbersToCalculate["secondNumber"] += digitInput[buttonID];
+            if (buttonID === "digit-decimal" && numbersToCalculate["secondNumber"].includes(".")) {
+                return;
+            } else {
+                numbersToCalculate["secondNumber"] += digitInput[buttonID];
+            };
         };
     };
 
@@ -103,7 +119,7 @@ function displayButton(button) {
     /* do not remove singular negative sign */
     /* this "works" but may be preferred to try to keep the number from before the error */
     if (isNaN(numbersToCalculate["firstNumber"]) || isNaN(numbersToCalculate["secondNumber"])) {
-        if (numbersToCalculate["firstNumber"] !== "-" && numbersToCalculate["secondNumber"] !== "-") {
+        if (numbersToCalculate["firstNumber"] !== "-" && numbersToCalculate["firstNumber"] !== "." && numbersToCalculate["secondNumber"] !== "-" && numbersToCalculate["secondNumber"] !== ".") {
             clearNumbersToCalculate();
         }
     }
