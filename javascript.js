@@ -151,15 +151,18 @@ function addZeroes(num) { // Prevent NaN errors if input is only a negative sign
 }
 
 function adjustZeroes(number) {
-    // TO-DO: Need to address zeroes earlier in the process and within the actual numbersToCalculate instead of just the display value
-    while (number[0] === "0" && number[1] === "0") { // as long as the first and second digits are zero
-        number = number.slice(1); // remove the first 0
-    };
+    // while (number[0] === "0" && number[1] === "0") { // as long as the first and second digits are zero
+    //     number = number.slice(1); // remove the first 0
+    // };
 
-    if (number[0] === "0" && number[1] !== "." && number.length > 1) {
+    if (number[0] === "0" && number[1] !== "." && number.length > 1) { // prevents something like "0200", allows "0.0200"
         number = number.slice(1);
     }; 
-    
+
+    if (number[0] === "-" && number[1] === "0" && number.length > 2) { // turns something like "-02" into "-2"
+        number = number.slice(0, 1) + number.slice(2); 
+    }
+
     return addZeroes(number);
 }
 
