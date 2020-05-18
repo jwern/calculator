@@ -84,7 +84,7 @@ function displayButton(button) {
             } else if (buttonID === "digit-decimal" && numbersToCalculate[activeNumber()].includes(".")) {
                 return; // if the activeNumber already has a decimal in it and decimal is hit again, don't add another decimal - exit function
             } else {
-                numbersToCalculate[activeNumber()] += digitInput[buttonID];
+                numbersToCalculate[activeNumber()] = adjustZeroes(numbersToCalculate[activeNumber()] += digitInput[buttonID]);
             };
             
         };
@@ -105,8 +105,8 @@ function displayButton(button) {
         };
     }
 
-    numberToDisplay = removeLeadingZeroes(numbersToCalculate["secondNumber"] || numbersToCalculate["firstNumber"] || "0");
-    
+    numberToDisplay = numbersToCalculate["secondNumber"] || numbersToCalculate["firstNumber"] || "0";
+
     resultsScreen.textContent = numberToDisplay;
 
     /* remove NaN values before the next calculation */
@@ -118,7 +118,7 @@ function displayButton(button) {
 function checkForErrors() {
     if (isNaN(numbersToCalculate["firstNumber"]) || isNaN(numbersToCalculate["secondNumber"])) {
         clearNumbersToCalculate();
-    }
+    };
 }
 
 function firstNumberEditable() { // Checks if operator is empty, which tells us if we're editing the firstNumber (true) or secondNumber (false)
@@ -137,32 +137,36 @@ function addOrRemoveNegative(string) {
     if (string[0] === "-") {
         return string.slice(1); // if first letter is negative, remove the negative
     } else {
-        return `-${string}`; // otherwise add the negative
+        return addZeroes(`-${string}`); // otherwise add the negative
     };
 }
 
-function removeLeadingZeroes(number) {
-    // TO-DO: Need to address zeroes earlier in the process and within the actual numbersToCalculate instead of just the display value
-    while (number[0] === "0" && number.length > 1) { // as long as the first digit is zero and the number is longer than 1 digit:
-        number = number.slice(1); // remove the first 0
-    }
-
-    return number;
-}
-
-function clearNumbersToCalculate() {
-    for (key in numbersToCalculate) {
-        numbersToCalculate[key] = "";
-    };
-}
-
-function addZeroes(num) { // Prevent NaN errors if input is only a negative sign or decimal (TEMP fix)
+function addZeroes(num) { // Prevent NaN errors if input is only a negative sign or decimal
     let acceptedDigits = {
         "-": "-0",
         ".": "0.",
     };
 
     return acceptedDigits[num] || num;
+}
+
+function adjustZeroes(number) {
+    // TO-DO: Need to address zeroes earlier in the process and within the actual numbersToCalculate instead of just the display value
+    while (number[0] === "0" && number[1] === "0") { // as long as the first and second digits are zero
+        number = number.slice(1); // remove the first 0
+    };
+
+    if (number[0] === "0" && number[1] !== "." && number.length > 1) {
+        number = number.slice(1);
+    }; 
+    
+    return addZeroes(number);
+}
+
+function clearNumbersToCalculate() {
+    for (key in numbersToCalculate) {
+        numbersToCalculate[key] = "";
+    };
 }
 
 function add(num1, num2) { 
@@ -182,7 +186,7 @@ function divide(num1, num2) {
         return "Can't divide by 0";
     } else {
         return Number(num1) / Number(num2 || num1);
-    }
+    };
 }
 
 function operate(operator, num1, num2) {
@@ -191,11 +195,7 @@ function operate(operator, num1, num2) {
         "-": subtract,
         "*": multiply,
         "/": divide,
-    }
+    };
 
-    return operators[operator](addZeroes(num1), addZeroes(num2));
-    // TO-DO: Ideally we'll deal with zeroes before they get to the operate function
-    // and will be able to switch back to just (num1, num2) here
-    // addZeroes function is a temporary fix for solitary decimals or negatives
-    // so they don't cause NaN errors
+    return operators[operator](num1, num2);
 }
