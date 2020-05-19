@@ -20,7 +20,7 @@ let lastOperation = { // Used for equations with multiple equals in a row, or no
 buttons.forEach(button => button.addEventListener('click', translateButtonToID));
 document.addEventListener('keydown', translateKeyToID);
 
-function translateKeyToID(key) {
+function translateKeyToID(key) { // keyboard input
     const keyInput = {
         "1": "digit-1",
         "2": "digit-2",
@@ -46,15 +46,19 @@ function translateKeyToID(key) {
         173: "digit-negative", // the minus on underscore key
         109: "operator-minus", // the minus on numpad
     }
+
+    if (key.key === "Enter") { // prevents Enter key from submitting operation twice
+        key.preventDefault();
+    };
     
-    if ((keyInput[key.key] || keyCodeInput[key.keyCode])) {
+    if (keyInput[key.key] || keyCodeInput[key.keyCode]) {
         displayButton(keyInput[key.key] || keyCodeInput[key.keyCode]);
     } else {
         return;
     };
 }
 
-function translateButtonToID(button) {
+function translateButtonToID(button) { // button/click input
     displayButton(button.target.id);
 }
 
@@ -82,7 +86,7 @@ function displayButton(button) {
     };
 
     let buttonID = button;
-    
+
     /* if button pressed is Clear, delete all previous inputs */
     if (buttonID === "function-clear") {
         clearNumbersToCalculate();
