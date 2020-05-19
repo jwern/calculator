@@ -17,7 +17,46 @@ let lastOperation = { // Used for equations with multiple equals in a row, or no
     lastOperator: "",
 }
 
-buttons.forEach(button => button.addEventListener('click', displayButton));
+buttons.forEach(button => button.addEventListener('click', translateButtonToID));
+document.addEventListener('keydown', translateKeyToID);
+
+function translateKeyToID(key) {
+    const keyInput = {
+        "1": "digit-1",
+        "2": "digit-2",
+        "3": "digit-3",
+        "4": "digit-4",
+        "5": "digit-5",
+        "6": "digit-6",
+        "7": "digit-7",
+        "8": "digit-8",
+        "9": "digit-9",
+        "0": "digit-0",
+        ".": "digit-decimal",
+        "+": "operator-plus",
+        "*": "operator-multiply",
+        "/": "operator-divide",
+        "=": "operator-equals",
+        "Enter": "operator-equals",
+        "Backspace": "function-backspace",
+        "Escape": "function-clear",
+    };
+
+    const keyCodeInput = {
+        173: "digit-negative", // the minus on underscore key
+        109: "operator-minus", // the minus on numpad
+    }
+    
+    if ((keyInput[key.key] || keyCodeInput[key.keyCode])) {
+        displayButton(keyInput[key.key] || keyCodeInput[key.keyCode]);
+    } else {
+        return;
+    };
+}
+
+function translateButtonToID(button) {
+    displayButton(button.target.id);
+}
 
 function displayButton(button) {
     const digitInput = {
@@ -33,17 +72,17 @@ function displayButton(button) {
         "digit-0": "0",
         "digit-decimal": ".",
         "digit-negative": "-",
-    }
+    };
 
     const operatorInput = {
         "operator-divide": "/",
         "operator-multiply": "*",
         "operator-plus": "+",
         "operator-minus": "-",
-    }
+    };
 
-    let buttonID = button.target.id;
-
+    let buttonID = button;
+    
     /* if button pressed is Clear, delete all previous inputs */
     if (buttonID === "function-clear") {
         clearNumbersToCalculate();
@@ -84,7 +123,7 @@ function displayButton(button) {
             numbersToCalculate[activeNumber()] = addOrRemoveNegative(numbersToCalculate[activeNumber()]);
         } else {
             if (lastButtonPressed === "operator-equals") { // if the last button pressed was "=", we're editing from scratch again, not appending digits
-                numbersToCalculate[activeNumber()] = digitInput[buttonID];
+                numbersToCalculate[activeNumber()] = adjustZeroes(digitInput[buttonID]);
             } else if (buttonID === "digit-decimal" && numbersToCalculate[activeNumber()].includes(".")) {
                 return; // if the activeNumber already has a decimal in it and decimal is hit again, don't add another decimal - exit function
             } else {
