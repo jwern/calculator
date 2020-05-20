@@ -51,7 +51,7 @@ function translateKeyToID(key) { // keyboard input
         key.preventDefault();
     };
     
-    if (keyInput[key.key] || keyCodeInput[key.keyCode]) {
+    if (keyInput[key.key] || keyCodeInput[key.keyCode]) { // only use valid keys, break if invalid (like "e" etc.)
         displayButton(keyInput[key.key] || keyCodeInput[key.keyCode]);
     } else {
         return;
@@ -142,7 +142,7 @@ function displayButton(button) {
             numbersToCalculate["workingOperator"] = operatorInput[buttonID]; // if there is no operator, assign as operator
         } else {
             if (operatorInput.hasOwnProperty(lastButtonPressed)) {
-                numbersToCalculate["workingOperator"] = operatorInput[buttonID]; // if there is an operator that was just added, overwrite it.  Example: 2 + - 1 = 1, not 3
+                numbersToCalculate["workingOperator"] = operatorInput[buttonID]; // if there is an operator that was just added, overwrite it.  Example: "2 + - 1 =" is 1, not 3
             } else { // if there is an operator and last button was not an operator, complete the calculation and assign result to firstNumber, then assign new operator.
                 numbersToCalculate["firstNumber"] = `${operate(numbersToCalculate["workingOperator"], numbersToCalculate["firstNumber"], numbersToCalculate["secondNumber"])}`;
                 numbersToCalculate["workingOperator"] = operatorInput[buttonID];
@@ -161,11 +161,7 @@ function displayButton(button) {
     lastButtonPressed = buttonID;
 }
 
-function checkForErrors() {
-    if (isNaN(numbersToCalculate["firstNumber"]) || isNaN(numbersToCalculate["secondNumber"])) {
-        clearNumbersToCalculate();
-    };
-}
+/* Functions to determine current numbers */
 
 function firstNumberEditable() { // Checks if operator is empty, which tells us if we're editing the firstNumber (true) or secondNumber (false)
     return numbersToCalculate["workingOperator"] === emptyString();
@@ -178,6 +174,8 @@ function activeNumber() { // Determines which number in numbersToCalculate we're
         return "secondNumber";
     };
 }
+
+/* Functions to adjust for zeroes, negatives, or decimals */
 
 function addOrRemoveNegative(string) {
     if (string[0] === "-") {
@@ -208,6 +206,8 @@ function adjustZeroes(number) {
     return addZeroes(number);
 }
 
+/* Functions to clear variables */
+
 function emptyString() {
     return "";
 }
@@ -217,6 +217,14 @@ function clearNumbersToCalculate() {
         numbersToCalculate[key] = emptyString();
     };
 }
+
+function checkForErrors() {
+    if (isNaN(numbersToCalculate["firstNumber"]) || isNaN(numbersToCalculate["secondNumber"])) {
+        clearNumbersToCalculate();
+    };
+}
+
+/* Functions for math operations*/
 
 function add(num1, num2) { 
     return Number(num1) + Number(num2 || num1);
