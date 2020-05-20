@@ -47,12 +47,15 @@ function translateKeyToID(key) { // keyboard input
         109: "operator-minus", // the minus on numpad
     }
 
-    if (key.key === "Enter") { // prevents Enter key from submitting operation twice
+    if (key.key === "Enter" || key.key === "/") { // prevents Enter key from submitting operation twice or "/" from opening search
         key.preventDefault();
     };
     
-    if (keyInput[key.key] || keyCodeInput[key.keyCode]) { // only use valid keys, break if invalid (like "e" etc.)
-        displayButton(keyInput[key.key] || keyCodeInput[key.keyCode]);
+    let keyID = keyInput[key.key] || keyCodeInput[key.keyCode];
+
+    if (keyID) { // only use valid keys, break if invalid (like "e" etc.)
+        highlightKeyPress(keyID);
+        displayButton(keyID);
     } else {
         return;
     };
@@ -157,8 +160,28 @@ function displayButton(button) {
 
     /* remove NaN values before the next calculation */
     checkForErrors();
-    
+
+    if (lastButtonPressed !== emptyString()) {
+        removeHighlight(buttonID);
+    };
+
     lastButtonPressed = buttonID;
+}
+
+/* Functions to highlight keys (instead of hover) when using keyboard */
+
+function highlightKeyPress(key) {
+    let buttonPressed = document.querySelector('#' + key);
+    buttonPressed.classList.add("key-pressed-color"); 
+}
+
+function removeHighlight(currentKey) {
+    if (lastButtonPressed === currentKey) { // if a button is pressed multiple times in a row, remain highlighted
+        return;
+    } else {
+        let buttonPressed = document.querySelector('#' + lastButtonPressed);
+        buttonPressed.classList.remove("key-pressed-color");
+    };
 }
 
 /* Functions to determine current numbers */

@@ -52,10 +52,6 @@ html, body, .outer-body {
     background-color: #DAD6D6;
 }
 
-#function-clear:hover {
-    background-color: #EA7317;
-}
-
 #function-backspace {
     grid-column: 4/5;
 }
@@ -152,7 +148,22 @@ html, body, .outer-body {
 }
 
 .btn-primary:hover,
-.btn-secondary:hover {
+.btn-secondary:hover,
+#function-clear:hover {
     background-color: #EA7317;
     border-color: #33658A;
+}
+
+.key-pressed-color {
+    background-color: #EA7317 !important;
+    color: white !important;
+}
+
+@media (max-width: 768px) {
+    .calculator-body {
+        height: 100vmin;
+    }
+    html, body, .outer-body {
+        padding-top: 10px;
+    }
 }
