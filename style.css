@@ -9,11 +9,14 @@ html, body, .outer-body {
     min-width: 300px;
     min-height: 400px;
     margin: auto;
-    background: rgb(188,189,188);
-    background: linear-gradient(180deg, rgba(188,189,188,1) 0%, rgba(99,99,99,1) 15%, rgba(51,51,51,1) 100%);
+    padding: 6px;
+    background: #33658A;
     display: grid;
     grid-template-columns: 3fr 1fr;
     grid-template-rows: 1fr 1fr 3fr;
+    -webkit-box-shadow: -2px 5px 8px 3px rgba(28,57,77,1);
+    -moz-box-shadow: -2px 5px 8px 3px rgba(28,57,77,1);
+    box-shadow: -2px 5px 8px 3px rgba(28,57,77,1);
 }
 
 .screen {
@@ -30,6 +33,9 @@ html, body, .outer-body {
     justify-content: flex-end;
     padding-right: 4px;
     overflow: auto;
+    -webkit-box-shadow: inset 0px 0px 1px 1px rgba(28,57,77,1);
+    -moz-box-shadow: inset 0px 0px 1px 1px rgba(28,57,77,1);
+    box-shadow: inset 0px 0px 1px 1px rgba(28,57,77,1);
 }
 
 .function-buttons {
@@ -43,6 +49,11 @@ html, body, .outer-body {
 
 #function-clear {
     grid-column: 3/4;
+    background-color: #DAD6D6;
+}
+
+#function-clear:hover {
+    background-color: #EA7317;
 }
 
 #function-backspace {
@@ -121,4 +132,27 @@ html, body, .outer-body {
     grid-template-rows: repeat(5, 1fr);
     grid-gap: 5px;
     margin: 10px;
+}
+
+.btn-primary {
+    background-color: #FEC601;
+}
+
+.btn-secondary {
+    background-color: #73BFB8;
+}
+
+.btn-primary,
+.btn-secondary {
+    border-color: #33658A;
+    border-radius: 8px;
+    font-size: 20px;
+    font-weight: 600;
+    color: #061A40;
+}
+
+.btn-primary:hover,
+.btn-secondary:hover {
+    background-color: #EA7317;
+    border-color: #33658A;
 }
